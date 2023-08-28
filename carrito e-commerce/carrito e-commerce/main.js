@@ -1,3 +1,5 @@
+
+
 const productList = document.querySelector("#productList");
 const completeList = document.querySelector("#completeList");
 const productosLimpieza = document.querySelector("#limpieza");
@@ -124,38 +126,58 @@ const verProductos = (listado) => {
 
 const mostrarCarrito = () => {
 
-    const totalCarrito = carrito.reduce((total, producto) => total + producto.precio, 0);
+    const total = carrito.reduce((total, producto) => total + producto.precio, 0);
+    if (carrito.length > 0) {
+        
+        listadoCarrito.innerHTML = " ----- Carrito ----- ";
+        
+        let divCarrito = document.createElement("div");
+        divCarrito.classList.add("contenedor-carrito");
+        listadoCarrito.appendChild(divCarrito);
+        carrito.forEach((producto, index) => {
 
-    listadoCarrito.innerHTML = " ----- Carrito ----- ";
-    let divCarrito = document.createElement("div");
-    divCarrito.classList.add("contenedor-carrito");
-    listadoCarrito.appendChild(divCarrito);
-    carrito.forEach((producto, index) => {
+            let divProducto = document.createElement("div");
+            divProducto.classList.add("div-producto");
 
-        let divProducto = document.createElement("div");
-        divProducto.classList.add("div-producto");
+            let productoNombre = document.createElement("li")
+            productoNombre.innerHTML = producto.articulo;
+            divProducto.appendChild(productoNombre);
 
-        let productoNombre = document.createElement("li")
-        productoNombre.innerHTML = producto.articulo;
-        divProducto.appendChild(productoNombre);
+            let btnEliminar = document.createElement("button");
+            btnEliminar.classList.add("boton-eliminar");
+            btnEliminar.innerHTML = "Eliminar Producto";
 
-        let btnEliminar = document.createElement("button");
-        btnEliminar.classList.add("boton-eliminar");
-        btnEliminar.innerHTML = "Eliminar Producto";
+            btnEliminar.onclick = () => {
+                carrito.splice(index, 1);
+                localStorage.setItem("carro", JSON.stringify(carrito));
+                mostrarCarrito();
+            };
+            divProducto.appendChild(btnEliminar);
+            divCarrito.appendChild(divProducto);
+        })
 
-        btnEliminar.onclick = () => {
-            carrito.splice(index, 1);
-            localStorage.setItem("carro", JSON.stringify(carrito));
-            mostrarCarrito();    
-        };
-        divProducto.appendChild(btnEliminar);
-        divCarrito.appendChild(divProducto);
-    })
+        let resumenCarrito = document.createElement("div");
+        let botonCarrito = document.createElement("button");
+        botonCarrito.classList.add("boton-carrito")
+        botonCarrito.innerHTML = "Calcular Total";
+        resumenCarrito.appendChild(botonCarrito);
+        resumenCarrito.classList.add("total-carrito");
+        divCarrito.appendChild(resumenCarrito);
 
-    let resumenCarrito = document.createElement("div");
-    resumenCarrito.classList.add("total-carrito");
-    resumenCarrito.innerHTML = `Total: $ ${totalCarrito}`;
-    divCarrito.appendChild(resumenCarrito);
+        let totalCarrito = document.createElement("p");
+        totalCarrito.innerHTML = ` Total: $ ${total}`;
+
+
+        botonCarrito.onclick = () => {
+            resumenCarrito.appendChild(totalCarrito);
+        }
+        
+        
+    } else {
+        listadoCarrito.innerHTML = " "
+    }
+
+
 }
 
 

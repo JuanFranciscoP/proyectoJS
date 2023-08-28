@@ -70,6 +70,12 @@ button {
     text-align: center;
 }
 
+.boton-carrito {
+    margin-top: 2rem;
+    background-color: var(--col-secundario);
+    color: #FFF;
+}
+
 .container {
     display: flex;
     justify-content: space-between;
