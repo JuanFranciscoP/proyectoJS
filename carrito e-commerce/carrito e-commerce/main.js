@@ -28,12 +28,27 @@ const obtenerProductos = async () => {
 
 
 
-
+//modificando la funcion agregar producto para que en vez de copiar los productos, desestructure los mismos para obtener un objeto nuevo antes de pushearlo en el array de carrito
 
 
 const agregarProducto = (item) => {
-    carrito = [...carrito, item];
+    const {id,articulo,precio} = item;
+    let producto = {
+        id:id,
+        articulo:articulo,
+        precio:precio,
+        cantidad:1
+    }
+
+    if(carrito.some(producto => producto.articulo === articulo)){
+        const index = carrito.findIndex(producto => producto.articulo === articulo);
+        carrito[index].cantidad ++;
+    } else {
+        carrito = [...carrito,producto];
+    }
+    console.log(carrito);
     localStorage.setItem("carro", JSON.stringify(carrito));
+    
     mostrarCarrito();
 }
 
@@ -60,6 +75,14 @@ const verProductos = (listado) => {
         productList.appendChild(div);
 
         btnAgregar.onclick = () => {
+            Toastify({
+                text: "Producto agregado",
+                className: "info",
+                style: {
+                background: "linear-gradient(to right)",
+                
+                }
+            }).showToast();
             agregarProducto(producto);
         }
 
@@ -71,7 +94,7 @@ const verProductos = (listado) => {
 
 const mostrarCarrito = () => {
 
-    const total = carrito.reduce((total, producto) => total + producto.precio, 0);
+    const total = carrito.reduce((total, producto) => total + producto.precio*producto.cantidad, 0);
     if (carrito.length > 0) {
         
         cart.innerHTML = " ";
@@ -84,8 +107,14 @@ const mostrarCarrito = () => {
             let divProducto = document.createElement("div");
             divProducto.classList.add("div-producto");
 
+
             let productoNombre = document.createElement("li")
-            productoNombre.innerHTML = producto.articulo;
+            if(producto.cantidad > 1){
+                productoNombre.innerText = `${producto.articulo} ---x${producto.cantidad}`
+            } else {
+                productoNombre.innerHTML = producto.articulo;
+            }
+            
             divProducto.appendChild(productoNombre);
 
             let btnEliminar = document.createElement("button");
@@ -93,7 +122,12 @@ const mostrarCarrito = () => {
             btnEliminar.innerHTML = "Eliminar Producto";
 
             btnEliminar.onclick = () => {
-                carrito.splice(index, 1);
+                if(producto.cantidad > 1){
+                    producto.cantidad --;
+                }else {
+                    carrito.splice(index, 1);
+                }
+                
                 localStorage.setItem("carro", JSON.stringify(carrito));
                 mostrarCarrito();
             };
@@ -116,7 +150,7 @@ const mostrarCarrito = () => {
         
         
     } else {
-        cart.innerText = " Su Carrito esta vacio! "
+        cart.innerText = "ups, parece que no has agregado nada al carro";
     }
 
 

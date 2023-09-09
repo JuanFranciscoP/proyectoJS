@@ -10,8 +10,9 @@
 
 
 body{
-    background-color: var(--col-primario);
-    font-size: 1.6rem;
+    background: rgb(0,26,36);
+    background: linear-gradient(90deg, rgba(0,26,36,1) 0%, rgba(73,106,104,1) 54%);
+    font-size: 1rem;
     line-height: 1.5;
     color: var(--col-gris);
     font-family: var(--fuentePrincipal);
@@ -22,13 +23,14 @@ h1 {
     font-size: 1.8rem;
     justify-content: center;
     text-align: center;
+    color: var(--col-blanco);
 }
 
 button {
     background-color: #D4A373;
     padding: .5rem;
     color: var(--col-negro);
-    font-size: 2rem;
+    font-size: 1rem;
 }
 
 .navbar-div {
