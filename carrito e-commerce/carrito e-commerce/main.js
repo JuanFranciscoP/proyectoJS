@@ -3,108 +3,53 @@
 const productList = document.querySelector("#productList");
 const completeList = document.querySelector("#completeList");
 const productosLimpieza = document.querySelector("#limpieza");
-const productosAlmacen = document.querySelector("#almacen")
-const listadoCarrito = document.querySelector("#carrito")
+const productosAlmacen = document.querySelector("#almacen");
+const listadoCarrito = document.querySelector("#carrito");
+const cart = document.querySelector(".modal-body");
+const btnCompra = document.querySelector(".btn-compra");
 
-
-
-
-
-
-
-let productos = [
-    {
-        articulo: "Pan 1kg",
-        precio: 500,
-        seccion: "almacen"
-    },
-    {
-        articulo: "Agua mineral 2L",
-        precio: 300,
-        seccion: "almacen"
-    },
-    {
-        articulo: "Queso-500gr",
-        precio: 700,
-        seccion: "almacen"
-    },
-    {
-        articulo: "Balde 10L",
-        precio: 1500,
-        seccion: "limpieza"
-    },
-    {
-        articulo: "Mopa",
-        precio: 900,
-        seccion: "limpieza"
-    },
-    {
-        articulo: "Lavandina 1L",
-        precio: 250,
-        seccion: "limpieza"
-    },
-    {
-        articulo: "Detergente",
-        precio: 850,
-        seccion: "limpieza"
-    },
-    {
-        articulo: "Fideos 200gr",
-        precio: 400,
-        seccion: "almacen"
-    },
-    {
-        articulo: "Salsa de tomate",
-        precio: 250,
-        seccion: "almacen"
-    },
-    {
-        articulo: "cafe en granos 250gr",
-        precio: 2500,
-        seccion: "almacen"
-    },
-    {
-        articulo: "Mayonesa Natura 250gr",
-        precio: 1700,
-        seccion: "almacen"
-    },
-    {
-        articulo: "Lomitos de Atun 180gr",
-        precio: 900,
-        seccion: "almacen"
-    }
-];
 
 let carrito = JSON.parse(localStorage.getItem("carro")) || [];
 
+let listado;
 
-localStorage.setItem("productos", JSON.stringify(productos));
+const obtenerProductos = async () => {
+    const resp = await fetch("db/productos.json");
+    const data = await resp.json();
+    
+    listado = data;
+
+    verProductos(listado);
+    mostrarCarrito();
+}
+
+
+
+
 
 
 
 
 
 const agregarProducto = (item) => {
-
     carrito = [...carrito, item];
     localStorage.setItem("carro", JSON.stringify(carrito));
     mostrarCarrito();
 }
 
-console.log(carrito.length);
+
 
 const verProductos = (listado) => {
+    
 
     listado.forEach(producto => {
-
         let div = document.createElement("div");
         div.classList.add("div-list");
-
         let li = document.createElement("li");
         li.innerHTML = `${producto.articulo} - $ ${producto.precio}`;
 
         let btnAgregar = document.createElement("button");
-        btnAgregar.classList.add("boton-lista");
+        btnAgregar.classList.add("btn","btn-secondary");
         btnAgregar.innerHTML = "Agregar Producto";
 
 
@@ -129,11 +74,11 @@ const mostrarCarrito = () => {
     const total = carrito.reduce((total, producto) => total + producto.precio, 0);
     if (carrito.length > 0) {
         
-        listadoCarrito.innerHTML = " ----- Carrito ----- ";
+        cart.innerHTML = " ";
         
         let divCarrito = document.createElement("div");
         divCarrito.classList.add("contenedor-carrito");
-        listadoCarrito.appendChild(divCarrito);
+        cart.appendChild(divCarrito);
         carrito.forEach((producto, index) => {
 
             let divProducto = document.createElement("div");
@@ -144,7 +89,7 @@ const mostrarCarrito = () => {
             divProducto.appendChild(productoNombre);
 
             let btnEliminar = document.createElement("button");
-            btnEliminar.classList.add("boton-eliminar");
+            btnEliminar.classList.add("btn", "btn-secondary", "--bs-info");
             btnEliminar.innerHTML = "Eliminar Producto";
 
             btnEliminar.onclick = () => {
@@ -153,28 +98,25 @@ const mostrarCarrito = () => {
                 mostrarCarrito();
             };
             divProducto.appendChild(btnEliminar);
-            divCarrito.appendChild(divProducto);
+            cart.appendChild(divProducto);
         })
 
         let resumenCarrito = document.createElement("div");
-        let botonCarrito = document.createElement("button");
-        botonCarrito.classList.add("boton-carrito")
-        botonCarrito.innerHTML = "Calcular Total";
-        resumenCarrito.appendChild(botonCarrito);
+
         resumenCarrito.classList.add("total-carrito");
-        divCarrito.appendChild(resumenCarrito);
+        
 
         let totalCarrito = document.createElement("p");
-        totalCarrito.innerHTML = ` Total: $ ${total}`;
+        totalCarrito.classList.add("m-auto")
+        totalCarrito.innerText = ` Total: $ ${total}`;
+        resumenCarrito.appendChild(totalCarrito);
 
+        cart.appendChild(resumenCarrito);
 
-        botonCarrito.onclick = () => {
-            resumenCarrito.appendChild(totalCarrito);
-        }
         
         
     } else {
-        listadoCarrito.innerHTML = " "
+        cart.innerText = " Su Carrito esta vacio! "
     }
 
 
@@ -182,27 +124,56 @@ const mostrarCarrito = () => {
 
 
 //eventos
+cart.onclick = () => {
+    mostrarCarrito();
+}
+
 
 completeList.onclick = () => {
     productList.innerHTML = " ";
-    verProductos(productos);
+    verProductos(listado);
 }
 
 productosLimpieza.onclick = () => {
     productList.innerHTML = " ";
-    let listadoLimpieza = productos.filter(producto => producto.seccion.toLowerCase() === "limpieza");
+    let listadoLimpieza = listado.filter(producto => producto.seccion.toLowerCase() === "limpieza");
     verProductos(listadoLimpieza);
 }
 
 productosAlmacen.onclick = () => {
     productList.innerHTML = " ";
-    let listadoAlmacen = productos.filter(producto => producto.seccion.toLowerCase() === "almacen");
+    let listadoAlmacen = listado.filter(producto => producto.seccion.toLowerCase() === "almacen");
     verProductos(listadoAlmacen);
     localStorage.setItem("soloAlmacen", JSON.stringify(listadoAlmacen));
 }
 
+btnCompra.onclick = () => {
+    
+    if(carrito.length > 0){
+        Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: 'Gracias por Su Compra!',
+            showConfirmButton: false,
+            timer: 3000})
+    
+            carrito = [];
+            localStorage.setItem("carro", JSON.stringify(carrito));
+            mostrarCarrito();
+    } else {
+        Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'No ha agregado ningun item al carrito!',
+            showConfirmButton: false,
+            timer: 3000})
+    }
+    
+}
 
 
-verProductos(productos);
-mostrarCarrito();
+
+
+
+obtenerProductos();
 
